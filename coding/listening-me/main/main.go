@@ -1,11 +1,26 @@
 package main
 
-import "github.com/gin-gonic/gin"
+import (
+	"fmt"
+	"html/template"
+	"net/http"
+)
 
+func sayHello(w http.ResponseWriter, r *http.Request) {
+	// 解析指定文件生成模板对象
+	tmpl, err := template.ParseFiles("./hello.tmpl")
+	if err != nil {
+		fmt.Println("create template failed, err:", err)
+		return
+	}
+	// 利用给定数据渲染模板，并将结果写入w
+	tmpl.Execute(w, "沙河小王子")
+}
 func main() {
-	r := gin.Default()
-	r.GET("/", func(c *gin.Context) {
-		c.String(200, "Hello, Geektutu")
-	})
-	r.Run() // listen and serve on 0.0.0.0:8080
+	http.HandleFunc("/", sayHello)
+	err := http.ListenAndServe(":9090", nil)
+	if err != nil {
+		fmt.Println("HTTP server failed,err:", err)
+		return
+	}
 }
